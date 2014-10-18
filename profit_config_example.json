@@ -75,7 +75,7 @@
     "username" : "RPC_USERNAME",
     "passwd" : "RPC_PASSWORD",
     "host" : "localhost",
-    "port" : 7882,
+    "port" : 9376,
     "active" : 0,
     "hashespersec" : 6800000,
     "algo" : "scrypt",
