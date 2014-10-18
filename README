@@ -33,6 +33,13 @@ ProfitTest.py
 This is a trivial test-harness script that loads configuration from a JSON
 file and writes JSON to stdout.
 
+profit.py
+=========
+
+This is a simple implementation of a coin picker.  It takes the algorithm
+(sha256, scrypt, etc.) to check as a parameter and returns a sorted list of
+coins and expected 24-hour revenue, with the most profitable at the top.
+
 Dependencies
 ============
 
