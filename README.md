@@ -48,3 +48,10 @@ bitcoinrpc & jsonrpc:
 
 PyCryptsy (included as submodule):
   https://github.com/salfter/PyCryptsy
+
+Donations
+=========
+
+Donations are always welcome if you find this useful...hit the tipjar!
+
+bitcoin://1TipsGocnz2N5qgAm9f7JLrsMqkb3oXe2
