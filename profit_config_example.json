@@ -11,6 +11,16 @@
     "algo" : "sha256",
     "merged" : []
   },
+  "UNO" : {
+    "username" : "RPC_USERNAME",
+    "passwd" : "RPC_PASSWORD",
+    "host" : "localhost",
+    "port" : 65535,
+    "active" : 1,
+    "hashespersec" : 580000000000,
+    "algo" : "sha256",
+    "merged" : []
+  },
   "BTG" : {
     "username" : "RPC_USERNAME",
     "passwd" : "RPC_PASSWORD",
@@ -55,7 +65,7 @@
     "username" : "RPC_USERNAME",
     "passwd" : "RPC_PASSWORD",
     "host" : "localhost",
-    "port" : 8334,
+    "port" : 8336,
     "active" : 0,
     "hashespersec" : 580000000000,
     "algo" : "sha256",

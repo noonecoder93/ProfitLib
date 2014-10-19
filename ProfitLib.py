@@ -32,44 +32,77 @@ from PyCryptsy import PyCryptsy
 
 class ProfitLib:
 
+  # store config dictionary, init output dictionary, and initialize PyCryptsy
+
   def __init__(self, config):
     self.config=config
     self.out={}
     self.api=PyCryptsy(str(self.config["cryptsy_pubkey"]), str(self.config["cryptsy_privkey"]))
 
+  # get latest profitability info
+
   def Calculate(self):
-    self.mkts=self.api.GetMarketIDs("BTC")
+    self.mkts=self.api.GetMarketIDs("BTC") # update market rates
     for i, coin in enumerate(self.config):
-      if (coin!="cryptsy_pubkey" and coin!="cryptsy_privkey"):
-        if (self.config[coin]["active"]==1):
+      if (coin!="cryptsy_pubkey" and coin!="cryptsy_privkey"): # skip Cryptsy credentials when enumerating coin configs
+        if (self.config[coin]["active"]==1): # only check active configs
           url="http://"+self.config[coin]["username"]+":"+self.config[coin]["passwd"]+"@"+self.config[coin]["host"]+":"+str(self.config[coin]["port"])
-          hashrate=Decimal(self.config[coin]["hashespersec"])
+          hashrate=Decimal(self.config[coin]["hashespersec"]) # our hashrate
           self.out[coin]={}
+        
+          # connect to coind
         
           b=jsonrpc.ServiceProxy(url)
     
-          reward=Decimal(b.getblocktemplate({})["coinbasevalue"])
+          # get block reward, including transaction fees
+          # note #1: Novacoin reports 1% of actual value here
+          # note #2: Namecoin doesn't support getblocktemplate, so get 
+          #          coinbase value from last block
+    
+          try:
+            reward=Decimal(b.getblocktemplate({})["coinbasevalue"])
+          except:
+            reward=Decimal(0)
+            vouts=b.decoderawtransaction(b.getrawtransaction(b.getblock(b.getblockhash(b.getblockcount()))["tx"][0]))["vout"]
+            for j, vout in enumerate(vouts):
+              reward+=vout["value"]
           if (coin=="NVC"):
             reward*=100
+    
+          # get proof-of-work difficulty
     
           diff=b.getdifficulty()
           if (type(diff) is dict):
             diff=diff["proof-of-work"]
     
+          # get network hashrate
+          # note 1: Novacoin reports this in MH/s, not H/s
+          # note 2: Namecoin and Unobtanium don't report network hashrate, so 
+          #         return 0 (it's only informational anyway)
+                    
           try:
             nethashrate=b.getmininginfo()["networkhashps"]
           except:
-            nethashrate=int(b.getmininginfo()["netmhashps"]*1000000)
+            try:
+              nethashrate=int(b.getmininginfo()["netmhashps"]*1000000)
+            except:
+              nethashrate=0
     
-          self.out[coin]["reward"]=int(reward)
-          self.out[coin]["difficulty"]=float(diff.quantize(Decimal("1.00000000")))
-          self.out[coin]["nethashespersec"]=int(nethashrate)
+          # ported from my C# implementation at
+          # https://github.com/salfter/CoinProfitability/blob/master/CoinProfitabilityLibrary/Profitability.cs
 
           interval=Decimal(86400) # 1 day
           target=Decimal(((65535<<208)*100000000000)/(diff*100000000000))
           revenue=Decimal(interval*target*hashrate*reward/(1<<256))
 
+          # write to output dictionary
+
+          self.out[coin]["reward"]=int(reward)
+          self.out[coin]["difficulty"]=float(diff.quantize(Decimal("1.00000000")))
+          self.out[coin]["nethashespersec"]=int(nethashrate)
           self.out[coin]["daily_revenue"]=int(revenue)
+ 
+          # if not Bitcoin, get exchange rate and BTC equivalent
  
           if (coin!="BTC"):
             exch=self.api.GetBuyPriceByID(self.mkts[coin])
@@ -78,6 +111,8 @@ class ProfitLib:
           else:
             self.out[coin]["exchrate"]=100000000
             self.out[coin]["daily_revenue_btc"]=int(revenue)
+
+          # copy these informational values from config dictionary
 
           self.out[coin]["algo"]=self.config[coin]["algo"]
           self.out[coin]["merged"]=self.config[coin]["merged"]
