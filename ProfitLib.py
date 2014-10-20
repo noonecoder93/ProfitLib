@@ -123,10 +123,10 @@ class ProfitLib:
  
           if (coin!="BTC"):
             exch=self.api.GetBuyPriceByID(self.mkts[coin])
-            self.out[coin]["exchrate"]=int(exch)
+            self.out[coin]["exchrate"]=float(Decimal(exch).quantize(Decimal("1.00000000")))
             self.out[coin]["daily_revenue_btc"]=int(Decimal(revenue*Decimal(exch)))
           else:
-            self.out[coin]["exchrate"]=100000000
+            self.out[coin]["exchrate"]=float(Decimal(100000000).quantize(Decimal("1.00000000")))
             self.out[coin]["daily_revenue_btc"]=int(revenue)
 
           # copy these informational values from config dictionary
