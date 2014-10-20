@@ -51,21 +51,38 @@ class ProfitLib:
           self.out[coin]={}
         
           # connect to coind
-        
+          
           b=jsonrpc.ServiceProxy(url)
     
           # get block reward, including transaction fees
           # note #1: Novacoin reports 1% of actual value here
           # note #2: Namecoin doesn't support getblocktemplate, so get 
           #          coinbase value from last block
+          # note #3: PPCoin doesn't want any parameters passed to
+          #          getblocktemplate.  Bitcoin requires at least 
+          #          an empty dictionary to be passed.  Others don't
+          #          care.
     
+          reward=Decimal(0)
           try:
-            reward=Decimal(b.getblocktemplate({})["coinbasevalue"])
+            reward=Decimal(b.getblocktemplate()["coinbasevalue"])
           except:
-            reward=Decimal(0)
-            vouts=b.decoderawtransaction(b.getrawtransaction(b.getblock(b.getblockhash(b.getblockcount()))["tx"][0]))["vout"]
-            for j, vout in enumerate(vouts):
-              reward+=vout["value"]
+            pass
+            
+          if (reward==0):
+            try:
+              reward=Decimal(b.getblocktemplate({})["coinbasevalue"])
+            except:
+              pass
+
+          if (reward==0):            
+            try:
+              vouts=b.decoderawtransaction(b.getrawtransaction(b.getblock(b.getblockhash(b.getblockcount()))["tx"][0]))["vout"]
+              for j, vout in enumerate(vouts):
+                reward+=vout["value"]
+            except:
+              pass
+              
           if (coin=="NVC"):
             reward*=100
     
