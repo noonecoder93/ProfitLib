@@ -26,5 +26,5 @@
 from ProfitLib import *
 import json
 
-profit=ProfitLib(json.loads(open("profit_config.json").read()))
+profit=ProfitLib(json.loads(open("daemon_config.json").read()), json.loads(open("exchange_config.json").read())["cryptsy"])
 print json.dumps(profit.Calculate(), sort_keys=True, indent=4, separators=(',', ': '))

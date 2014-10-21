@@ -1,0 +1,7 @@
+{
+  "cryptsy" : {
+    "pubkey" : "CRYPTSY_API_PUBLIC_KEY",
+    "privkey" : "CRYPTSY_API_PRIVATE_KEY"
+  }
+}
+

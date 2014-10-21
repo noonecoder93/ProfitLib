@@ -5,10 +5,11 @@ This does the work of websites such as CoinChoose and CoinWarz, only with
 data obtained directly from coin daemons under your control (and from
 Cryptsy, which provides exchange-rate data).  
 
-The constructor takes a dictionary for configuration;
-profit_config_example.json provides an example of the information that needs
-to be provided.  Most fields are self-explanatory; the "active" field should
-be set to 1 to check a coin or 0 to skip it.
+The constructor takes two dictionaries for configuration;
+daemon_config_example.json and exchange_config_example.json provide examples
+of the information that needs to be provided.  Most fields are
+self-explanatory; the "active" field should be set to 1 to check a coin or 0
+to skip it.
 
 On each call of the Calculate() method, updated exchange-rate information is
 pulled from Cryptsy and updated mining information is pulled from each coin

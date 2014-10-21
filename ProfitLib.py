@@ -34,105 +34,104 @@ class ProfitLib:
 
   # store config dictionary, init output dictionary, and initialize PyCryptsy
 
-  def __init__(self, config):
-    self.config=config
+  def __init__(self, daemons, credentials):
+    self.daemons=daemons
     self.out={}
-    self.api=PyCryptsy(str(self.config["cryptsy_pubkey"]), str(self.config["cryptsy_privkey"]))
+    self.api=PyCryptsy(str(credentials["pubkey"]), str(credentials["privkey"]))
 
   # get latest profitability info
 
   def Calculate(self):
     self.mkts=self.api.GetMarketIDs("BTC") # update market rates
-    for i, coin in enumerate(self.config):
-      if (coin!="cryptsy_pubkey" and coin!="cryptsy_privkey"): # skip Cryptsy credentials when enumerating coin configs
-        if (self.config[coin]["active"]==1): # only check active configs
-          url="http://"+self.config[coin]["username"]+":"+self.config[coin]["passwd"]+"@"+self.config[coin]["host"]+":"+str(self.config[coin]["port"])
-          hashrate=Decimal(self.config[coin]["hashespersec"]) # our hashrate
-          self.out[coin]={}
-        
-          # connect to coind
+    for i, coin in enumerate(self.daemons):
+      if (self.daemons[coin]["active"]==1): # only check active configs
+        url="http://"+self.daemons[coin]["username"]+":"+self.daemons[coin]["passwd"]+"@"+self.daemons[coin]["host"]+":"+str(self.daemons[coin]["port"])
+        hashrate=Decimal(self.daemons[coin]["hashespersec"]) # our hashrate
+        self.out[coin]={}
+      
+        # connect to coind
+         
+        b=jsonrpc.ServiceProxy(url)
+    
+        # get block reward, including transaction fees
+        # note #1: Novacoin reports 1% of actual value here
+        # note #2: Namecoin doesn't support getblocktemplate, so get 
+        #          coinbase value from last block
+        # note #3: PPCoin doesn't want any parameters passed to
+        #          getblocktemplate.  Bitcoin requires at least 
+        #          an empty dictionary to be passed.  Others don't
+        #          care.
+    
+        reward=Decimal(0)
+        try:
+          reward=Decimal(b.getblocktemplate()["coinbasevalue"])
+        except:
+          pass
           
-          b=jsonrpc.ServiceProxy(url)
-    
-          # get block reward, including transaction fees
-          # note #1: Novacoin reports 1% of actual value here
-          # note #2: Namecoin doesn't support getblocktemplate, so get 
-          #          coinbase value from last block
-          # note #3: PPCoin doesn't want any parameters passed to
-          #          getblocktemplate.  Bitcoin requires at least 
-          #          an empty dictionary to be passed.  Others don't
-          #          care.
-    
-          reward=Decimal(0)
+        if (reward==0):
           try:
-            reward=Decimal(b.getblocktemplate()["coinbasevalue"])
+            reward=Decimal(b.getblocktemplate({})["coinbasevalue"])
           except:
             pass
-            
-          if (reward==0):
-            try:
-              reward=Decimal(b.getblocktemplate({})["coinbasevalue"])
-            except:
-              pass
 
-          if (reward==0):            
-            try:
-              vouts=b.decoderawtransaction(b.getrawtransaction(b.getblock(b.getblockhash(b.getblockcount()))["tx"][0]))["vout"]
-              for j, vout in enumerate(vouts):
-                reward+=vout["value"]
-            except:
-              pass
-              
-          if (coin=="NVC"):
-            reward*=100
-    
-          # get proof-of-work difficulty
-    
-          diff=b.getdifficulty()
-          if (type(diff) is dict):
-            diff=diff["proof-of-work"]
-    
-          # get network hashrate
-          # note 1: Novacoin reports this in MH/s, not H/s
-          # note 2: Namecoin and Unobtanium don't report network hashrate, so 
-          #         return 0 (it's only informational anyway)
-                    
+        if (reward==0):            
           try:
-            nethashrate=b.getmininginfo()["networkhashps"]
+            vouts=b.decoderawtransaction(b.getrawtransaction(b.getblock(b.getblockhash(b.getblockcount()))["tx"][0]))["vout"]
+            for j, vout in enumerate(vouts):
+              reward+=vout["value"]
           except:
-            try:
-              nethashrate=int(b.getmininginfo()["netmhashps"]*1000000)
-            except:
-              nethashrate=0
+            pass
+              
+        if (coin=="NVC"):
+          reward*=100
     
-          # ported from my C# implementation at
-          # https://github.com/salfter/CoinProfitability/blob/master/CoinProfitabilityLibrary/Profitability.cs
+        # get proof-of-work difficulty
+    
+        diff=b.getdifficulty()
+        if (type(diff) is dict):
+          diff=diff["proof-of-work"]
+    
+        # get network hashrate
+        # note 1: Novacoin reports this in MH/s, not H/s
+        # note 2: Namecoin and Unobtanium don't report network hashrate, so 
+        #         return 0 (it's only informational anyway)
+                    
+        try:
+          nethashrate=b.getmininginfo()["networkhashps"]
+        except:
+          try:
+            nethashrate=int(b.getmininginfo()["netmhashps"]*1000000)
+          except:
+            nethashrate=0
+    
+        # ported from my C# implementation at
+        # https://github.com/salfter/CoinProfitability/blob/master/CoinProfitabilityLibrary/Profitability.cs
 
-          interval=Decimal(86400) # 1 day
-          target=Decimal(((65535<<208)*100000000000)/(diff*100000000000))
-          revenue=Decimal(interval*target*hashrate*reward/(1<<256))
+        interval=Decimal(86400) # 1 day
+        target=Decimal(((65535<<208)*100000000000)/(diff*100000000000))
+        revenue=Decimal(interval*target*hashrate*reward/(1<<256))
 
-          # write to output dictionary
+        # write to output dictionary
 
-          self.out[coin]["reward"]=int(reward)
-          self.out[coin]["difficulty"]=float(diff.quantize(Decimal("1.00000000")))
-          self.out[coin]["nethashespersec"]=int(nethashrate)
-          self.out[coin]["daily_revenue"]=int(revenue)
+        self.out[coin]["reward"]=int(reward)
+        self.out[coin]["difficulty"]=float(diff.quantize(Decimal("1.00000000")))
+        self.out[coin]["nethashespersec"]=int(nethashrate)
+        self.out[coin]["daily_revenue"]=int(revenue)
  
-          # if not Bitcoin, get exchange rate and BTC equivalent
+        # if not Bitcoin, get exchange rate and BTC equivalent
  
-          if (coin!="BTC"):
-            exch=self.api.GetBuyPriceByID(self.mkts[coin])
-            self.out[coin]["exchrate"]=float(Decimal(exch).quantize(Decimal("1.00000000")))
-            self.out[coin]["daily_revenue_btc"]=int(Decimal(revenue*Decimal(exch)))
-          else:
-            self.out[coin]["exchrate"]=float(Decimal(100000000).quantize(Decimal("1.00000000")))
-            self.out[coin]["daily_revenue_btc"]=int(revenue)
+        if (coin!="BTC"):
+          exch=self.api.GetBuyPriceByID(self.mkts[coin])
+          self.out[coin]["exchrate"]=float(Decimal(exch).quantize(Decimal("1.00000000")))
+          self.out[coin]["daily_revenue_btc"]=int(Decimal(revenue*Decimal(exch)))
+        else:
+          self.out[coin]["exchrate"]=float(Decimal(100000000).quantize(Decimal("1.00000000")))
+          self.out[coin]["daily_revenue_btc"]=int(revenue)
 
-          # copy these informational values from config dictionary
+        # copy these informational values from config dictionary
 
-          self.out[coin]["algo"]=self.config[coin]["algo"]
-          self.out[coin]["merged"]=self.config[coin]["merged"]
+        self.out[coin]["algo"]=self.daemons[coin]["algo"]
+        self.out[coin]["merged"]=self.daemons[coin]["merged"]
           
     return self.out
 
