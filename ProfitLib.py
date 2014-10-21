@@ -37,7 +37,7 @@ class ProfitLib:
   def __init__(self, daemons, credentials):
     self.daemons=daemons
     self.out={}
-    self.api=PyCryptsy(str(credentials["pubkey"]), str(credentials["privkey"]))
+    self.api=PyCryptsy(str(credentials["cryptsy"]["pubkey"]), str(credentials["cryptsy"]["privkey"]))
 
   # get latest profitability info
 

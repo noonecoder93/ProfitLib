@@ -36,7 +36,7 @@ if (len(sys.argv)!=2):
   
 algo=sys.argv[1]
 
-pl=ProfitLib(json.loads(open("daemon_config.json").read()), json.loads(open("exchange_config.json").read())["cryptsy"])
+pl=ProfitLib(json.loads(open("daemon_config.json").read()), json.loads(open("exchange_config.json").read()))
 profit=pl.Calculate()
 
 result={}
