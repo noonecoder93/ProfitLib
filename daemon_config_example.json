@@ -1,0 +1,102 @@
+{
+  "BTC" : {
+    "username" : "RPC_USERNAME",
+    "passwd" : "RPC_PASSWORD",
+    "host" : "localhost",
+    "port" : 8332,
+    "active" : 1,
+    "hashespersec" : 580000000000,
+    "algo" : "sha256",
+    "merged" : []
+  },
+  "UNO" : {
+    "username" : "RPC_USERNAME",
+    "passwd" : "RPC_PASSWORD",
+    "host" : "localhost",
+    "port" : 65535,
+    "active" : 1,
+    "hashespersec" : 580000000000,
+    "algo" : "sha256",
+    "merged" : []
+  },
+  "BTG" : {
+    "username" : "RPC_USERNAME",
+    "passwd" : "RPC_PASSWORD",
+    "host" : "localhost",
+    "port" : 8348,
+    "active" : 1,
+    "hashespersec" : 6800000,
+    "algo" : "scrypt",
+    "merged" : []
+  },
+  "GDC" : {
+    "username" : "RPC_USERNAME",
+    "passwd" : "RPC_PASSWORD",
+    "host" : "localhost",
+    "port" : 12378,
+    "active" : 0,
+    "hashespersec" : 6800000,
+    "algo" : "scrypt",
+    "merged" : []
+  },
+  "LTC" : {
+    "username" : "RPC_USERNAME",
+    "passwd" : "RPC_PASSWORD",
+    "host" : "localhost",
+    "port" : 9332,
+    "active" : 1,
+    "hashespersec" : 6800000,
+    "algo" : "scrypt",
+    "merged" : []
+  },
+  "DOGE" : {
+    "username" : "RPC_USERNAME",
+    "passwd" : "RPC_PASSWORD",
+    "host" : "localhost",
+    "port" : 22555,
+    "active" : 1,
+    "hashespersec" : 6800000,
+    "algo" : "scrypt",
+    "merged" : ["LTC"]
+  },
+  "NMC" : {
+    "username" : "RPC_USERNAME",
+    "passwd" : "RPC_PASSWORD",
+    "host" : "localhost",
+    "port" : 8336,
+    "active" : 0,
+    "hashespersec" : 580000000000,
+    "algo" : "sha256",
+    "merged" : ["BTC"]
+  },
+  "FTC" : {
+    "username" : "RPC_USERNAME",
+    "passwd" : "RPC_PASSWORD",
+    "host" : "localhost",
+    "port" : 9337,
+    "active" : 1,
+    "hashespersec" : 6800000,
+    "algo" : "scrypt",
+    "merged" : []
+  },
+  "ANC" : {
+    "username" : "RPC_USERNAME",
+    "passwd" : "RPC_PASSWORD",
+    "host" : "localhost",
+    "port" : 9376,
+    "active" : 0,
+    "hashespersec" : 6800000,
+    "algo" : "scrypt",
+    "merged" : []
+  },
+  "NVC" : {
+    "username" : "RPC_USERNAME",
+    "passwd" : "RPC_PASSWORD",
+    "host" : "localhost",
+    "port" : 8344,
+    "active" : 1,
+    "hashespersec" : 6800000,
+    "algo" : "scrypt",
+    "merged" : []
+  }
+}
