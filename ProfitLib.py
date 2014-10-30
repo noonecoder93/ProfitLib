@@ -54,7 +54,8 @@ class ProfitLib:
         b=jsonrpc.ServiceProxy(url)
     
         # get block reward, including transaction fees
-        # note #1: Novacoin reports 1% of actual value here
+        # note #1: Novacoin (and coins derived from it?) report
+        #          1% of actual value here
         # note #2: Namecoin doesn't support getblocktemplate, so get 
         #          coinbase value from last block
         # note #3: PPCoin doesn't want any parameters passed to
@@ -82,7 +83,7 @@ class ProfitLib:
           except:
             pass
               
-        if (coin=="NVC"):
+        if (coin=="NVC" or coin=="DEM" or coin=="OSC"):
           reward*=100
     
         # get proof-of-work difficulty
