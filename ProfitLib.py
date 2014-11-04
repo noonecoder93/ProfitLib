@@ -44,6 +44,7 @@ class ProfitLib:
   def Calculate(self):
     self.mkts=self.api.GetMarketIDs("BTC") # update market rates
     for i, coin in enumerate(self.daemons):
+      print coin
       if (self.daemons[coin]["active"]==1): # only check active configs
         url="http://"+self.daemons[coin]["username"]+":"+self.daemons[coin]["passwd"]+"@"+self.daemons[coin]["host"]+":"+str(self.daemons[coin]["port"])
         hashrate=Decimal(self.daemons[coin]["hashespersec"]) # our hashrate
@@ -87,10 +88,22 @@ class ProfitLib:
           reward*=100
     
         # get proof-of-work difficulty
+        # try getmininginfo first to minimize RPC calls; only use
+        # getdifficulty if we must (as with NMC)
     
-        diff=b.getdifficulty()
-        if (type(diff) is dict):
-          diff=diff["proof-of-work"]
+        algo=self.daemons[coin]["algo"]
+        if (algo=="sha256"):
+          algo="sha256d"
+        try:
+          mining_info=b.getmininginfo()
+          diff=mining_info["difficulty_"+algo] # for MYR & other multi-algo coins
+        except:
+          try:
+            diff=mining_info["difficulty"]
+          except:
+            diff=b.getdifficulty()
+            if (type(diff) is dict):
+              diff=diff["proof-of-work"]
     
         # get network hashrate
         # note 1: Novacoin reports this in MH/s, not H/s
@@ -98,10 +111,10 @@ class ProfitLib:
         #         return 0 (it's only informational anyway)
                     
         try:
-          nethashrate=b.getmininginfo()["networkhashps"]
+          nethashrate=mining_info["networkhashps"]
         except:
           try:
-            nethashrate=int(b.getmininginfo()["netmhashps"]*1000000)
+            nethashrate=int(mining_info["netmhashps"]*1000000)
           except:
             nethashrate=0
     
