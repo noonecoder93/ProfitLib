@@ -44,7 +44,6 @@ class ProfitLib:
   def Calculate(self):
     self.mkts=self.api.GetMarketIDs("BTC") # update market rates
     for i, coin in enumerate(self.daemons):
-      print coin
       if (self.daemons[coin]["active"]==1): # only check active configs
         url="http://"+self.daemons[coin]["username"]+":"+self.daemons[coin]["passwd"]+"@"+self.daemons[coin]["host"]+":"+str(self.daemons[coin]["port"])
         hashrate=Decimal(self.daemons[coin]["hashespersec"]) # our hashrate
