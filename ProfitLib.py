@@ -96,9 +96,13 @@ class ProfitLib:
         try:
           mining_info=b.getmininginfo()
           diff=mining_info["difficulty_"+algo] # for MYR & other multi-algo coins
+          if (type(diff) is dict):
+            diff=diff["proof-of-work"]
         except:
           try:
             diff=mining_info["difficulty"]
+            if (type(diff) is dict):
+              diff=diff["proof-of-work"]
           except:
             diff=b.getdifficulty()
             if (type(diff) is dict):
