@@ -3,7 +3,10 @@ ProfitLib.py
 
 This does the work of websites such as CoinChoose and CoinWarz, only with
 data obtained directly from coin daemons under your control (and from
-Cryptsy, which provides exchange-rate data).  
+the exchanges you select, which provide exchange-rate data).  
+
+Exchange information is available from your choice of Cryptsy, Bittrex, 
+Coins-E, and C-CEX.
 
 The constructor takes two dictionaries for configuration;
 daemon_config_example.json and exchange_config_example.json provide examples
@@ -12,7 +15,7 @@ self-explanatory; the "active" field should be set to 1 to check a coin or 0
 to skip it.
 
 On each call of the Calculate() method, updated exchange-rate information is
-pulled from Cryptsy and updated mining information is pulled from each coin
+pulled from the exchanges and updated mining information is pulled from each coin
 daemon.  It returns a dictionary with current network hashrate, difficulty,
 and block reward, and expected 24-hour revenue in the coin in question and
 in Bitcoin.
@@ -49,6 +52,12 @@ bitcoinrpc & jsonrpc:
 
 PyCryptsy (included as submodule):
   https://github.com/salfter/PyCryptsy
+python-bittrex (included as submodule):
+  https://github.com/ericsomdahl/python-bittrex
+PyCoinsE (included as submodule):
+  https://github.com/salfter/PyCoinsE
+PyCCEX (included as submodule):
+  https://github.com/salfter/PyCCEX
 
 Donations
 =========

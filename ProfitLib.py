@@ -29,6 +29,12 @@ import sys
 from decimal import *
 sys.path.insert(0, './PyCryptsy/')
 from PyCryptsy import PyCryptsy
+sys.path.insert(0, './python-bittrex/bittrex/')
+from bittrex import Bittrex
+sys.path.insert(0, './PyCCEX/')
+from PyCCEX import PyCCEX
+sys.path.insert(0, './PyCoinsE/')
+from PyCoinsE import PyCoinsE
 
 class ProfitLib:
 
@@ -37,12 +43,83 @@ class ProfitLib:
   def __init__(self, daemons, credentials):
     self.daemons=daemons
     self.out={}
-    self.api=PyCryptsy(str(credentials["cryptsy"]["pubkey"]), str(credentials["cryptsy"]["privkey"]))
+    self.api={}
+    for i, exch in enumerate(credentials):
+      processed=False
+      if (exch=="cryptsy"):
+        self.api[exch]=PyCryptsy(str(credentials[exch]["pubkey"]), str(credentials[exch]["privkey"]))
+        processed=True
+      if (exch=="bittrex"):
+        self.api[exch]=Bittrex(str(credentials[exch]["pubkey"]), str(credentials[exch]["privkey"]))
+        processed=True
+      if (exch=="c-cex"):
+        self.api[exch]=PyCCEX(str(credentials[exch]["key"]))
+        processed=True
+      if (exch=="coins-e"):
+        self.api[exch]=PyCoinsE(str(credentials[exch]["pubkey"]), str(credentials[exch]["privkey"]))
+        processed=True
+      if (processed==False):
+        raise ValueError("unknown exchange") 
 
+  # update market IDs
+  def GetMarketIDs(self):
+    self.mkts={}
+    for i, exch in enumerate(self.api):
+      if (exch=="cryptsy"):
+        self.mkts[exch]=self.api[exch].GetMarketIDs("BTC")
+      if (exch=="bittrex"):
+        self.mkts[exch]={}
+        m=self.api[exch].get_markets()["result"]
+        for j, market in enumerate(m):
+          if (market["BaseCurrency"].upper()=="BTC"):
+            self.mkts[exch][market["MarketCurrency"].upper()]=market["MarketName"]
+      if (exch=="c-cex"):
+        self.mkts[exch]={}
+        m=self.api[exch].Query("pairs", {})["pairs"]
+        for j, pair in enumerate(m):
+          if (pair.split("-")[1].upper()=="BTC"):
+            self.mkts[exch][pair.split("-")[0].upper()]=pair
+      if (exch=="coins-e"):
+        self.mkts[exch]={}
+        m=self.api[exch].unauthenticated_request("markets/list")["markets"]
+        for j, market in enumerate(m):
+          if (market["c2"].upper()=="BTC"):
+            self.mkts[exch][market["c1"].upper()]=market["pair"]
+
+  # get best bid from the exchanges
+  def GetBestBid(self, coin):
+    bids={}
+    for i, exch in enumerate(self.api):
+      if (exch=="cryptsy"):
+        try:
+          bids[exch]=self.api[exch].GetBuyPriceByID(self.mkts[exch][coin])
+        except:
+          pass
+      if (exch=="bittrex"):
+        try:
+          bids[exch]=self.api[exch].get_ticker(self.mkts[exch][coin])["result"]["Bid"]
+        except:
+          pass
+      if (exch=="c-cex"):
+        try:
+          bids[exch]=self.api[exch].Query(self.mkts[exch][coin], {})["ticker"]["buy"]
+        except:
+          pass
+      if (exch=="coins-e"):
+        try:
+          bids[exch]=self.api[exch].unauthenticated_request("market/"+self.mkts[exch][coin]+"/depth")["marketdepth"]["bids"][0]["r"]
+        except:
+          pass
+    max_bid=(0, "none")
+    for i, exch in enumerate(bids):
+      if (bids[exch]>max_bid[0]):
+        max_bid=(bids[exch], exch)
+    return max_bid
+    
   # get latest profitability info
 
   def Calculate(self):
-    self.mkts=self.api.GetMarketIDs("BTC") # update market rates
+    self.GetMarketIDs()
     for i, coin in enumerate(self.daemons):
       if (self.daemons[coin]["active"]==1): # only check active configs
         url="http://"+self.daemons[coin]["username"]+":"+self.daemons[coin]["passwd"]+"@"+self.daemons[coin]["host"]+":"+str(self.daemons[coin]["port"])
@@ -62,7 +139,7 @@ class ProfitLib:
         #          getblocktemplate.  Bitcoin requires at least 
         #          an empty dictionary to be passed.  Others don't
         #          care.
-    
+
         reward=Decimal(0)
         try:
           reward=Decimal(b.getblocktemplate()["coinbasevalue"])
@@ -138,11 +215,13 @@ class ProfitLib:
         # if not Bitcoin, get exchange rate and BTC equivalent
  
         if (coin!="BTC"):
-          exch=self.api.GetBuyPriceByID(self.mkts[coin])
-          self.out[coin]["exchrate"]=float(Decimal(exch).quantize(Decimal("1.00000000")))
-          self.out[coin]["daily_revenue_btc"]=int(Decimal(revenue*Decimal(exch)))
+          bid=self.GetBestBid(coin)
+          self.out[coin]["exchrate"]=float(Decimal(bid[0]).quantize(Decimal("1.00000000")))
+          self.out[coin]["exchange"]=bid[1]
+          self.out[coin]["daily_revenue_btc"]=int(Decimal(revenue*Decimal(bid[0])))
         else:
           self.out[coin]["exchrate"]=float(Decimal(100000000).quantize(Decimal("1.00000000")))
+          self.out[coin]["exchange"]="n/a"
           self.out[coin]["daily_revenue_btc"]=int(revenue)
 
         # copy these informational values from config dictionary
