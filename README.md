@@ -52,10 +52,13 @@ bitcoinrpc & jsonrpc:
 
 PyCryptsy (included as submodule):
   https://github.com/salfter/PyCryptsy
+
 python-bittrex (included as submodule):
   https://github.com/ericsomdahl/python-bittrex
+
 PyCoinsE (included as submodule):
   https://github.com/salfter/PyCoinsE
+
 PyCCEX (included as submodule):
   https://github.com/salfter/PyCCEX
 
