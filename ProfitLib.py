@@ -27,13 +27,13 @@ import bitcoinrpc
 import jsonrpc
 import sys
 from decimal import *
-sys.path.insert(0, './PyCryptsy/')
+sys.path.insert(0, './ProfitLib/PyCryptsy/')
 from PyCryptsy import PyCryptsy
-sys.path.insert(0, './python-bittrex/bittrex/')
+sys.path.insert(0, './ProfitLib/python-bittrex/bittrex/')
 from bittrex import Bittrex
-sys.path.insert(0, './PyCCEX/')
+sys.path.insert(0, './ProfitLib/PyCCEX/')
 from PyCCEX import PyCCEX
-sys.path.insert(0, './PyCoinsE/')
+sys.path.insert(0, './ProfitLib/PyCoinsE/')
 from PyCoinsE import PyCoinsE
 
 class ProfitLib:
@@ -127,7 +127,7 @@ class ProfitLib:
         self.out[coin]={}
       
         # connect to coind
-         
+
         b=jsonrpc.ServiceProxy(url)
     
         # get block reward, including transaction fees
@@ -162,7 +162,7 @@ class ProfitLib:
               
         if (coin=="NVC" or coin=="DEM" or coin=="OSC"):
           reward*=100
-    
+
         # get proof-of-work difficulty
         # try getmininginfo first to minimize RPC calls; only use
         # getdifficulty if we must (as with NMC)
@@ -184,7 +184,7 @@ class ProfitLib:
             diff=b.getdifficulty()
             if (type(diff) is dict):
               diff=diff["proof-of-work"]
-    
+              
         # get network hashrate
         # note 1: Novacoin reports this in MH/s, not H/s
         # note 2: Namecoin and Unobtanium don't report network hashrate, so 
@@ -197,21 +197,21 @@ class ProfitLib:
             nethashrate=int(mining_info["netmhashps"]*1000000)
           except:
             nethashrate=0
-    
+            
         # ported from my C# implementation at
         # https://github.com/salfter/CoinProfitability/blob/master/CoinProfitabilityLibrary/Profitability.cs
 
         interval=Decimal(86400) # 1 day
         target=Decimal(((65535<<208)*100000000000)/(diff*100000000000))
         revenue=Decimal(interval*target*hashrate*reward/(1<<256))
-
+        
         # write to output dictionary
 
         self.out[coin]["reward"]=int(reward)
-        self.out[coin]["difficulty"]=float(diff.quantize(Decimal("1.00000000")))
+        self.out[coin]["difficulty"]=float(Decimal(diff).quantize(Decimal("1.00000000")))
         self.out[coin]["nethashespersec"]=int(nethashrate)
         self.out[coin]["daily_revenue"]=int(revenue)
- 
+
         # if not Bitcoin, get exchange rate and BTC equivalent
  
         if (coin!="BTC"):
