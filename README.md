@@ -6,7 +6,7 @@ data obtained directly from coin daemons under your control (and from
 the exchanges you select, which provide exchange-rate data).  
 
 Exchange information is available from your choice of Cryptsy, Bittrex, 
-Coins-E, and C-CEX.
+Cryptopia, and C-CEX.
 
 The constructor takes two dictionaries for configuration;
 daemon_config_example.json and exchange_config_example.json provide examples
@@ -56,8 +56,8 @@ PyCryptsy (included as submodule):
 python-bittrex (included as submodule):
   https://github.com/ericsomdahl/python-bittrex
 
-PyCoinsE (included as submodule):
-  https://github.com/salfter/PyCoinsE
+PyCryptopia (included as submodule):
+  https://github.com/salfter/PyCryptopia
 
 PyCCEX (included as submodule):
   https://github.com/salfter/PyCCEX
