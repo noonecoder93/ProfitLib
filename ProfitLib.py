@@ -3,7 +3,7 @@
 
 # ProfitLib.py: mining profitability library
 #
-# Copyright © 2014 Scott Alfter
+# Copyright © 2014-2015 Scott Alfter
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
