@@ -111,7 +111,6 @@ class ProfitLib:
     self.GetMarketIDs()
     for i, coin in enumerate(self.daemons):
       if (self.daemons[coin]["active"]==1): # only check active configs
-        print coin
         url="http://"+self.daemons[coin]["username"]+":"+self.daemons[coin]["passwd"]+"@"+self.daemons[coin]["host"]+":"+str(self.daemons[coin]["port"])
         hashrate=Decimal(self.daemons[coin]["hashespersec"]) # our hashrate
         self.out[coin]={}
