@@ -10,3 +10,6 @@
 [submodule "PyCoinsE"]
 	path = PyCoinsE
 	url = https://github.com/salfter/PyCoinsE
+[submodule "PyCryptopia"]
+	path = PyCryptopia
+	url = https://github.com/salfter/PyCryptopia

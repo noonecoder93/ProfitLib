@@ -27,14 +27,14 @@ import bitcoinrpc
 import jsonrpc
 import sys
 from decimal import *
-sys.path.insert(0, './ProfitLib/PyCryptsy/')
+sys.path.insert(0, './PyCryptsy/')
 from PyCryptsy import PyCryptsy
-sys.path.insert(0, './ProfitLib/python-bittrex/bittrex/')
+sys.path.insert(0, './python-bittrex/bittrex/')
 from bittrex import Bittrex
-sys.path.insert(0, './ProfitLib/PyCCEX/')
+sys.path.insert(0, './PyCCEX/')
 from PyCCEX import PyCCEX
-sys.path.insert(0, './ProfitLib/PyCoinsE/')
-from PyCoinsE import PyCoinsE
+sys.path.insert(0, './PyCryptopia/')
+from PyCryptopia import PyCryptopia
 
 class ProfitLib:
 
@@ -55,8 +55,8 @@ class ProfitLib:
       if (exch=="c-cex"):
         self.api[exch]=PyCCEX(str(credentials[exch]["key"]))
         processed=True
-      if (exch=="coins-e"):
-        self.api[exch]=PyCoinsE(str(credentials[exch]["pubkey"]), str(credentials[exch]["privkey"]))
+      if (exch=="cryptopia"):
+        self.api[exch]=PyCryptopia()
         processed=True
       if (processed==False):
         raise ValueError("unknown exchange") 
@@ -65,7 +65,7 @@ class ProfitLib:
   def GetMarketIDs(self):
     self.mkts={}
     for i, exch in enumerate(self.api):
-      if (exch=="cryptsy"):
+      if (exch=="cryptsy" or exch=="cryptopia"):
         self.mkts[exch]=self.api[exch].GetMarketIDs("BTC")
       if (exch=="bittrex"):
         self.mkts[exch]={}
@@ -79,18 +79,12 @@ class ProfitLib:
         for j, pair in enumerate(m):
           if (pair.split("-")[1].upper()=="BTC"):
             self.mkts[exch][pair.split("-")[0].upper()]=pair
-      if (exch=="coins-e"):
-        self.mkts[exch]={}
-        m=self.api[exch].unauthenticated_request("markets/list")["markets"]
-        for j, market in enumerate(m):
-          if (market["c2"].upper()=="BTC"):
-            self.mkts[exch][market["c1"].upper()]=market["pair"]
 
   # get best bid from the exchanges
   def GetBestBid(self, coin):
     bids={}
     for i, exch in enumerate(self.api):
-      if (exch=="cryptsy"):
+      if (exch=="cryptsy" or exch=="cryptopia"):
         try:
           bids[exch]=self.api[exch].GetBuyPriceByID(self.mkts[exch][coin])
         except:
@@ -105,11 +99,6 @@ class ProfitLib:
           bids[exch]=self.api[exch].Query(self.mkts[exch][coin], {})["ticker"]["buy"]
         except:
           pass
-      if (exch=="coins-e"):
-        try:
-          bids[exch]=self.api[exch].unauthenticated_request("market/"+self.mkts[exch][coin]+"/depth")["marketdepth"]["bids"][0]["r"]
-        except:
-          pass
     max_bid=(0, "none")
     for i, exch in enumerate(bids):
       if (bids[exch]>max_bid[0]):
@@ -122,6 +111,7 @@ class ProfitLib:
     self.GetMarketIDs()
     for i, coin in enumerate(self.daemons):
       if (self.daemons[coin]["active"]==1): # only check active configs
+        print coin
         url="http://"+self.daemons[coin]["username"]+":"+self.daemons[coin]["passwd"]+"@"+self.daemons[coin]["host"]+":"+str(self.daemons[coin]["port"])
         hashrate=Decimal(self.daemons[coin]["hashespersec"]) # our hashrate
         self.out[coin]={}
