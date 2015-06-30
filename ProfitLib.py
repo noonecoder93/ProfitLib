@@ -204,7 +204,7 @@ class ProfitLib:
         # if not Bitcoin, get exchange rate and BTC equivalent
  
         if (coin!="BTC"):
-          bid=self.GetBestBid(coin)
+          bid=self.GetBestBid(coin.split("_")[0]) # 30 Jun 15: multi-algo compatibility
           self.out[coin]["exchrate"]=float(Decimal(bid[0]).quantize(Decimal("1.00000000")))
           self.out[coin]["exchange"]=bid[1]
           self.out[coin]["daily_revenue_btc"]=int(Decimal(revenue*Decimal(bid[0])))
