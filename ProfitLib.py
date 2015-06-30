@@ -149,7 +149,7 @@ class ProfitLib:
           except:
             pass
               
-        if (coin=="NVC" or coin=="DEM" or coin=="OSC"):
+        if (coin=="NVC" or coin=="DEM" or coin=="OSC" or coin=="PPC"):
           reward*=100
 
         # get proof-of-work difficulty
