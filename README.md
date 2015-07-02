@@ -6,7 +6,7 @@ data obtained directly from coin daemons under your control (and from
 the exchanges you select, which provide exchange-rate data).  
 
 Exchange information is available from your choice of Cryptsy, Bittrex, 
-Cryptopia, and C-CEX.
+Cryptopia, C-CEX, Poloniex, and Bleutrade.
 
 The constructor takes two dictionaries for configuration;
 daemon_config_example.json and exchange_config_example.json provide examples
@@ -61,6 +61,12 @@ PyCryptopia (included as submodule):
 
 PyCCEX (included as submodule):
   https://github.com/salfter/PyCCEX
+
+poloniex (included as submodule):
+  https://github.com/salfter/poloniex
+
+bleuBot (included as submodule):
+  https://github.com/Durendal/bleuBot
 
 Donations
 =========

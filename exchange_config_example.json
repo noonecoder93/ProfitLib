@@ -10,9 +10,14 @@
   "c-cex": {
     "key" : "C-CEX_API_KEY"
   },
-  "coins-e" : {
-    "pubkey" : "COINS-E_API_PUBLIC_KEY",
-    "privkey" : "COINS-E_API_PRIVATE_KEY"
+  "cryptopia": {},
+  "poloniex": {
+    "key": "POLONIEX_API_KEY",
+    "secret": "POLONIEX_API_SECRET"
+  },
+  "bleutrade": {
+    "key": "BLEUTRADE_API_KEY",
+    "secret": "BLEUTRADE_API_SECRET"
   }
 }
 

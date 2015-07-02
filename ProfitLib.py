@@ -35,6 +35,10 @@ sys.path.insert(0, './PyCCEX/')
 from PyCCEX import PyCCEX
 sys.path.insert(0, './PyCryptopia/')
 from PyCryptopia import PyCryptopia
+sys.path.insert(0, "./poloniex/")
+from poloniex import poloniex
+sys.path.insert(0, "./bleuBot/")
+from bleuBot import bleuBot
 
 class ProfitLib:
 
@@ -45,58 +49,86 @@ class ProfitLib:
     self.out={}
     self.api={}
     for i, exch in enumerate(credentials):
-      processed=False
       if (exch=="cryptsy"):
         self.api[exch]=PyCryptsy(str(credentials[exch]["pubkey"]), str(credentials[exch]["privkey"]))
-        processed=True
-      if (exch=="bittrex"):
+      elif (exch=="bittrex"):
         self.api[exch]=Bittrex(str(credentials[exch]["pubkey"]), str(credentials[exch]["privkey"]))
-        processed=True
-      if (exch=="c-cex"):
+      elif (exch=="c-cex"):
         self.api[exch]=PyCCEX(str(credentials[exch]["key"]))
-        processed=True
-      if (exch=="cryptopia"):
+      elif (exch=="cryptopia"):
         self.api[exch]=PyCryptopia()
-        processed=True
-      if (processed==False):
+      elif (exch=="poloniex"):
+        self.api[exch]=poloniex(str(credentials[exch]["key"]), str(credentials[exch]["secret"]))
+      elif (exch=="bleutrade"):
+        self.api[exch]=bleuBot(str(credentials[exch]["key"]), str(credentials[exch]["secret"]))
+      else:
         raise ValueError("unknown exchange") 
 
   # update market IDs
   def GetMarketIDs(self):
     self.mkts={}
     for i, exch in enumerate(self.api):
-      if (exch=="cryptsy" or exch=="cryptopia"):
+      if (exch=="cryptsy"):
+        self.mkts[exch]={}
+        coins=self.api[exch].Query("getcoindata", {})["return"]
+        markets=self.api[exch].GetMarketIDs("BTC")
+        for j in coins:
+          if (j["code"].upper() in markets.keys() and j["maintenancemode"]=="0"):
+              self.mkts[exch][j["code"].upper()]=markets[j["code"].upper()]
+      elif (exch=="cryptopia"):
         self.mkts[exch]=self.api[exch].GetMarketIDs("BTC")
-      if (exch=="bittrex"):
+      elif (exch=="bittrex"):
         self.mkts[exch]={}
         m=self.api[exch].get_markets()["result"]
         for j, market in enumerate(m):
-          if (market["BaseCurrency"].upper()=="BTC"):
+          if (market["BaseCurrency"].upper()=="BTC" and market["IsActive"]):
             self.mkts[exch][market["MarketCurrency"].upper()]=market["MarketName"]
-      if (exch=="c-cex"):
+      elif (exch=="c-cex"):
         self.mkts[exch]={}
         m=self.api[exch].Query("pairs", {})["pairs"]
         for j, pair in enumerate(m):
           if (pair.split("-")[1].upper()=="BTC"):
             self.mkts[exch][pair.split("-")[0].upper()]=pair
-
+      elif (exch=="poloniex"):
+        self.mkts[exch]={}
+        m=self.api[exch].returnTicker()
+        for j, pair in enumerate(m):
+          if (pair.split("_")[0].upper()=="BTC" and m[pair]["isFrozen"]=="0"):
+            self.mkts[exch][pair.split("_")[1].upper()]=pair
+      elif (exch=="bleutrade"):
+        self.mkts[exch]={}
+        m=self.api[exch].getMarketSummaries()["result"]
+        for j, pair in enumerate(m):
+          if (pair["MarketName"].split("_")[1].upper()=="BTC" and pair["IsActive"]=="true"):
+            self.mkts[exch][pair["MarketName"].split("_")[0].upper()]=pair["MarketName"]
+          
   # get best bid from the exchanges
   def GetBestBid(self, coin):
     bids={}
     for i, exch in enumerate(self.api):
       if (exch=="cryptsy" or exch=="cryptopia"):
         try:
-          bids[exch]=self.api[exch].GetBuyPriceByID(self.mkts[exch][coin])
+          bids[exch]=Decimal(self.api[exch].GetBuyPriceByID(self.mkts[exch][coin]))
         except:
           pass
-      if (exch=="bittrex"):
+      elif (exch=="bittrex"):
         try:
-          bids[exch]=self.api[exch].get_ticker(self.mkts[exch][coin])["result"]["Bid"]
+          bids[exch]=Decimal(self.api[exch].get_ticker(self.mkts[exch][coin])["result"]["Bid"])
         except:
           pass
-      if (exch=="c-cex"):
+      elif (exch=="c-cex"):
         try:
-          bids[exch]=self.api[exch].Query(self.mkts[exch][coin], {})["ticker"]["buy"]
+          bids[exch]=Decimal(self.api[exch].Query(self.mkts[exch][coin], {})["ticker"]["buy"])
+        except:
+          pass
+      elif (exch=="poloniex"):
+        try:
+          bids[exch]=Decimal(self.api[exch].returnOrderBook(self.mkts[exch][coin], 1)["bids"][0][0])
+        except:
+          pass
+      elif (exch=="bleutrade"):
+        try:
+          bids[exch]=Decimal(self.api[exch].getTicker(self.mkts[exch][coin])["result"][0]["bid"])
         except:
           pass
     max_bid=(0, "none")

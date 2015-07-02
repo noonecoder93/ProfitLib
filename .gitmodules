@@ -10,3 +10,9 @@
 [submodule "PyCryptopia"]
 	path = PyCryptopia
 	url = https://github.com/salfter/PyCryptopia
+[submodule "poloniex"]
+	path = poloniex
+	url = https://github.com/salfter/poloniex
+[submodule "bleuBot"]
+	path = bleuBot
+	url = https://github.com/Durendal/bleuBot
