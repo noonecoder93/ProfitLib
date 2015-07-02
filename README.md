@@ -44,6 +44,12 @@ This is a simple implementation of a coin picker.  It takes the algorithm
 (sha256, scrypt, etc.) to check as a parameter and returns a sorted list of
 coins and expected 24-hour revenue, with the most profitable at the top.
 
+balances.py
+===========
+
+This script dumps all non-zero wallet balances and finds the best exchange
+at which to trade each.
+
 Dependencies
 ============
 
