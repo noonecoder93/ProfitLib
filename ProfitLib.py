@@ -133,7 +133,7 @@ class ProfitLib:
           pass
     max_bid=(0, "none")
     for i, exch in enumerate(bids):
-      if (bids[exch]>max_bid[0]):
+      if (Decimal(bids[exch])>Decimal(max_bid[0])):
         max_bid=(bids[exch], exch)
     return max_bid
     
