@@ -27,7 +27,6 @@
 import bitcoinrpc
 import jsonrpc
 import json
-import pprint
 from ProfitLib import *
 
 daemons=json.loads(open("daemon_config.json").read())
@@ -35,6 +34,8 @@ exchanges=json.loads(open("exchange_config.json").read())
 pl=ProfitLib(daemons, exchanges)
 pl.GetMarketIDs()
 
+balances={}
+btcbal=Decimal(0)
 for i, coin in enumerate(daemons):
   if (daemons[coin]["active"]==1):
     url="http://"+daemons[coin]["username"]+":"+daemons[coin]["passwd"]+"@"+daemons[coin]["host"]+":"+str(daemons[coin]["port"])
@@ -42,11 +43,33 @@ for i, coin in enumerate(daemons):
     try:
       bal=b.getbalance()
       if (bal>0):
-        bid=pl.GetBestBid(coin)
-        print coin+": "+str(bal),
+        bid=pl.GetBestBid(coin.split("_")[0])
         if (coin!="BTC"):
-          print " ("+str((bid[0]*Decimal(bal)).quantize(Decimal("1.00000000")))+" BTC @ "+bid[1]+")"
+          balances[coin.split("_")[0]]=[str(bal), str((bid[0]*Decimal(bal)).quantize(Decimal("1.00000000"))), bid[1]]
+          btcbal+=bid[0]*Decimal(bal)
         else:
-          print
+          balances[coin.split("_")[0]]=[str(bal), str(bal), ""]
+          btcbal+=Decimal(bal)
     except IOError:
-      print coin+": offline"
+      print coin+" offline"
+
+exchtotals={}
+for i, coin in enumerate(balances):
+  try:
+    exchtotals[balances[coin][2]]+=Decimal(balances[coin][1])
+  except:
+    exchtotals[balances[coin][2]]=Decimal(balances[coin][1])
+
+for i, coin in enumerate(balances):
+  if (coin=="BTC"):
+    print coin+": "+balances[coin][0]
+  else:
+    print coin+": "+balances[coin][0]+" ("+balances[coin][1]+" BTC @ "+balances[coin][2]+")"
+
+print
+for i, exch in enumerate(exchtotals):
+  if (exch!=""):
+    print exch+": "+str(exchtotals[exch])+" BTC"
+
+print
+print "BTC total: "+str(btcbal.quantize(Decimal("1.00000000")))
