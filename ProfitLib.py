@@ -69,38 +69,56 @@ class ProfitLib:
     self.mkts={}
     for i, exch in enumerate(self.api):
       if (exch=="cryptsy"):
-        self.mkts[exch]={}
-        coins=self.api[exch].Query("getcoindata", {})["return"]
-        markets=self.api[exch].GetMarketIDs("BTC")
-        for j in coins:
-          if (j["code"].upper() in markets.keys() and j["maintenancemode"]=="0"):
-              self.mkts[exch][j["code"].upper()]=markets[j["code"].upper()]
+        try:
+          self.mkts[exch]={}
+          coins=self.api[exch].Query("getcoindata", {})["return"]
+          markets=self.api[exch].GetMarketIDs("BTC")
+          for j in coins:
+            if (j["code"].upper() in markets.keys() and j["maintenancemode"]=="0"):
+                self.mkts[exch][j["code"].upper()]=markets[j["code"].upper()]
+        except:
+          print "warning: Cryptsy offline"
       elif (exch=="cryptopia"):
-        self.mkts[exch]=self.api[exch].GetMarketIDs("BTC")
+        try:
+          self.mkts[exch]=self.api[exch].GetMarketIDs("BTC")
+        except:
+          print "warning: Cryptopia offline"
       elif (exch=="bittrex"):
-        self.mkts[exch]={}
-        m=self.api[exch].get_markets()["result"]
-        for j, market in enumerate(m):
-          if (market["BaseCurrency"].upper()=="BTC" and market["IsActive"]):
-            self.mkts[exch][market["MarketCurrency"].upper()]=market["MarketName"]
+        try:
+          self.mkts[exch]={}
+          m=self.api[exch].get_markets()["result"]
+          for j, market in enumerate(m):
+            if (market["BaseCurrency"].upper()=="BTC" and market["IsActive"]):
+              self.mkts[exch][market["MarketCurrency"].upper()]=market["MarketName"]
+        except:
+          print "warning: Bittrex offline"
       elif (exch=="c-cex"):
-        self.mkts[exch]={}
-        m=self.api[exch].Query("pairs", {})["pairs"]
-        for j, pair in enumerate(m):
-          if (pair.split("-")[1].upper()=="BTC"):
-            self.mkts[exch][pair.split("-")[0].upper()]=pair
+        try:
+          self.mkts[exch]={}
+          m=self.api[exch].Query("pairs", {})["pairs"]
+          for j, pair in enumerate(m):
+            if (pair.split("-")[1].upper()=="BTC"):
+              self.mkts[exch][pair.split("-")[0].upper()]=pair
+        except:
+          print "warning: C-CEX offline"
       elif (exch=="poloniex"):
-        self.mkts[exch]={}
-        m=self.api[exch].returnTicker()
-        for j, pair in enumerate(m):
-          if (pair.split("_")[0].upper()=="BTC" and m[pair]["isFrozen"]=="0"):
-            self.mkts[exch][pair.split("_")[1].upper()]=pair
+        try:
+          self.mkts[exch]={}
+          m=self.api[exch].returnTicker()
+          for j, pair in enumerate(m):
+            if (pair.split("_")[0].upper()=="BTC" and m[pair]["isFrozen"]=="0"):
+              self.mkts[exch][pair.split("_")[1].upper()]=pair
+        except:
+          print "warning: Poloniex offline"
       elif (exch=="bleutrade"):
-        self.mkts[exch]={}
-        m=self.api[exch].getMarketSummaries()["result"]
-        for j, pair in enumerate(m):
-          if (pair["MarketName"].split("_")[1].upper()=="BTC" and pair["IsActive"]=="true"):
-            self.mkts[exch][pair["MarketName"].split("_")[0].upper()]=pair["MarketName"]
+        try:
+          self.mkts[exch]={}
+          m=self.api[exch].getMarketSummaries()["result"]
+          for j, pair in enumerate(m):
+            if (pair["MarketName"].split("_")[1].upper()=="BTC" and pair["IsActive"]=="true"):
+              self.mkts[exch][pair["MarketName"].split("_")[0].upper()]=pair["MarketName"]
+        except:
+          print "warning: Bleutrade offline"
           
   # get best bid from the exchanges
   def GetBestBid(self, coin):
