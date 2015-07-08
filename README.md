@@ -56,22 +56,22 @@ Dependencies
 bitcoinrpc & jsonrpc:
   https://github.com/jgarzik/python-bitcoinrpc
 
-PyCryptsy (included as submodule):
+PyCryptsy:
   https://github.com/salfter/PyCryptsy
 
-python-bittrex (included as submodule):
+python-bittrex:
   https://github.com/ericsomdahl/python-bittrex
 
-PyCryptopia (included as submodule):
+PyCryptopia:
   https://github.com/salfter/PyCryptopia
 
-PyCCEX (included as submodule):
+PyCCEX:
   https://github.com/salfter/PyCCEX
 
-poloniex (included as submodule):
+poloniex:
   https://github.com/salfter/poloniex
 
-bleuBot (included as submodule):
+bleuBot:
   https://github.com/Durendal/bleuBot
 
 Donations
