@@ -27,17 +27,11 @@ import bitcoinrpc
 import jsonrpc
 import sys
 from decimal import *
-sys.path.insert(0, './PyCryptsy/')
 from PyCryptsy import PyCryptsy
-sys.path.insert(0, './python-bittrex/bittrex/')
-from bittrex import Bittrex
-sys.path.insert(0, './PyCCEX/')
+from bittrex import bittrex as Bittrex
 from PyCCEX import PyCCEX
-sys.path.insert(0, './PyCryptopia/')
 from PyCryptopia import PyCryptopia
-sys.path.insert(0, "./poloniex/")
 from poloniex import poloniex
-sys.path.insert(0, "./bleuBot/")
 from bleuBot import bleuBot
 
 class ProfitLib:
@@ -52,7 +46,7 @@ class ProfitLib:
       if (exch=="cryptsy"):
         self.api[exch]=PyCryptsy(str(credentials[exch]["pubkey"]), str(credentials[exch]["privkey"]))
       elif (exch=="bittrex"):
-        self.api[exch]=Bittrex(str(credentials[exch]["pubkey"]), str(credentials[exch]["privkey"]))
+        self.api[exch]=Bittrex.Bittrex(str(credentials[exch]["pubkey"]), str(credentials[exch]["privkey"]))
       elif (exch=="c-cex"):
         self.api[exch]=PyCCEX(str(credentials[exch]["key"]))
       elif (exch=="cryptopia"):

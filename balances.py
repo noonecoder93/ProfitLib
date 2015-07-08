@@ -37,7 +37,6 @@ pl.GetMarketIDs()
 balances={}
 btcbal=Decimal(0)
 for i, coin in enumerate(daemons):
-  print coin
   if (daemons[coin]["active"]==1):
     url="http://"+daemons[coin]["username"]+":"+daemons[coin]["passwd"]+"@"+daemons[coin]["host"]+":"+str(daemons[coin]["port"])
     b=jsonrpc.ServiceProxy(url)
