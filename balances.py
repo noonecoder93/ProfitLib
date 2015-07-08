@@ -24,7 +24,6 @@
 # DEALINGS IN THE SOFTWARE.
 
 
-import bitcoinrpc
 import jsonrpc
 import json
 from ProfitLib import *

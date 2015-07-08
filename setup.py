@@ -15,7 +15,7 @@ setup(
     url='https://github.com/salfter/ProfitLib',
     py_modules=['ProfitLib'],
     zip_safe=False,
-    install_requires=["bitcoinrpc","jsonrpc","PyCryptsy","python-bittrex","PyCCEX","PyCryptopia","poloniex","bleuBot"],
+    install_requires=["jsonrpc","PyCryptsy","python-bittrex","PyCCEX","PyCryptopia","poloniex","bleuBot"],
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',

@@ -53,7 +53,7 @@ at which to trade each.
 Dependencies
 ============
 
-bitcoinrpc & jsonrpc:
+bitcoinrpc:
   https://github.com/jgarzik/python-bitcoinrpc
 
 PyCryptsy:
